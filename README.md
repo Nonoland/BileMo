@@ -1,2 +1,0 @@
-# BileMo
-Projet OpenClassrooms
