@@ -59,9 +59,7 @@ class BelimoCreateCustomerCommand extends Command
             return $matchedNames;
         });
         $storeNameSelected = $io->askQuestion($questionStore);
-        $storeEntity = $storesByName[$storeNameSelected];
-
-        $customer->setStore($storeEntity);
+        $customer->setStore($storesByName[$storeNameSelected]);
 
         $this->entityManager->persist($customer);
         $this->entityManager->flush();
