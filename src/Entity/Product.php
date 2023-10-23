@@ -35,6 +35,12 @@ class Product
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $image = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $brand = null;
+
+    #[ORM\Column(length: 14)]
+    private ?string $gtin = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -120,6 +126,30 @@ class Product
     public function setImage(?string $image): static
     {
         $this->image = $image;
+
+        return $this;
+    }
+
+    public function getBrand(): ?string
+    {
+        return $this->brand;
+    }
+
+    public function setBrand(?string $brand): static
+    {
+        $this->brand = $brand;
+
+        return $this;
+    }
+
+    public function getGtin(): ?string
+    {
+        return $this->gtin;
+    }
+
+    public function setGtin(string $gtin): static
+    {
+        $this->gtin = $gtin;
 
         return $this;
     }
