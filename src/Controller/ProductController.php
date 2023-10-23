@@ -6,7 +6,6 @@ use App\Entity\Product;
 use App\Repository\ProductRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RequestMatcher\PortRequestMatcher;
 use Symfony\Component\Routing\Annotation\Route;
 
 class ProductController extends AbstractController
