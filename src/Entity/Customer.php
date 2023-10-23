@@ -3,8 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\CustomerRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CustomerRepository::class)]
@@ -15,60 +13,67 @@ class Customer
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\OneToMany(mappedBy: 'customer', targetEntity: UserCustomer::class)]
-    private Collection $userCustomer;
+    #[ORM\Column(length: 255)]
+    private ?string $lastname = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    private ?string $firstname = null;
 
-    public function __construct()
-    {
-        $this->userCustomer = new ArrayCollection();
-    }
+    #[ORM\Column(length: 255)]
+    private ?string $email = null;
+
+    #[ORM\ManyToOne(inversedBy: 'customers')]
+    private ?Store $store = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @return Collection<int, UserCustomer>
-     */
-    public function getUserCustomer(): Collection
+    public function getLastname(): ?string
     {
-        return $this->userCustomer;
+        return $this->lastname;
     }
 
-    public function addUserCustomer(UserCustomer $userCustomer): static
+    public function setLastname(string $lastname): static
     {
-        if (!$this->userCustomer->contains($userCustomer)) {
-            $this->userCustomer->add($userCustomer);
-            $userCustomer->setCustomer($this);
-        }
+        $this->lastname = $lastname;
 
         return $this;
     }
 
-    public function removeUserCustomer(UserCustomer $userCustomer): static
+    public function getFirstname(): ?string
     {
-        if ($this->userCustomer->removeElement($userCustomer)) {
-            // set the owning side to null (unless already changed)
-            if ($userCustomer->getCustomer() === $this) {
-                $userCustomer->setCustomer(null);
-            }
-        }
+        return $this->firstname;
+    }
+
+    public function setFirstname(string $firstname): static
+    {
+        $this->firstname = $firstname;
 
         return $this;
     }
 
-    public function getName(): ?string
+    public function getEmail(): ?string
     {
-        return $this->name;
+        return $this->email;
     }
 
-    public function setName(string $name): static
+    public function setEmail(string $email): static
     {
-        $this->name = $name;
+        $this->email = $email;
+
+        return $this;
+    }
+
+    public function getStore(): ?Store
+    {
+        return $this->store;
+    }
+
+    public function setStore(?Store $store): static
+    {
+        $this->store = $store;
 
         return $this;
     }
