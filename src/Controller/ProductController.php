@@ -35,7 +35,7 @@ class ProductController extends AbstractController
         $data['data'] = $product->getData();
         $data['links']['self'] = $this->generateUrl('app_product_detail', ['id' => $product->getId()]);
 
-       return $this->json($data);
+        return $this->json($data);
     }
 
     private function getProductPageSchema(int $page = 1): array
