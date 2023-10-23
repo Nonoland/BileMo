@@ -52,14 +52,13 @@ class BelimoCreateCustomerCommand extends Command
             $input = strtolower($input);
             $matchedNames = [];
             foreach ($storesByName as $name => $store) {
-                if (strpos(strtolower($name), $input) === 0) {
+                if (str_starts_with(strtolower($name), $input)) {
                     $matchedNames[] = $name;
                 }
             }
             return $matchedNames;
         });
-        $storeNameSelected = $io->askQuestion($questionStore);
-        $customer->setStore($storesByName[$storeNameSelected]);
+        $customer->setStore($storesByName[$io->askQuestion($questionStore)]);
 
         $this->entityManager->persist($customer);
         $this->entityManager->flush();
