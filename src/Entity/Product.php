@@ -153,4 +153,20 @@ class Product
 
         return $this;
     }
+
+    public function getData(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'name' => $this->getName(),
+            'gtin' => $this->getGtin(),
+            'brand' => $this->getBrand(),
+            'image' => $this->getImage(),
+            'supplier_price' => $this->getSupplierPrice(),
+            'suggested_price' => $this->getSuggestedPrice(),
+            'short_description' => $this->getShortDescription(),
+            'description' => $this->getDescription(),
+            'features' => $this->getFeatures()
+        ];
+    }
 }
