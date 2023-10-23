@@ -1,0 +1,10 @@
+engines:
+  phpcodesniffer:
+    enabled: true
+    checks:
+      PSR1 Files SideEffects FoundWithSymbols:
+        enabled: false
+      Squiz WhiteSpace ScopeKeywordSpacing Incorrect:
+        enabled: false
+      Generic Files LineLength TooLong:
+        enabled: false
