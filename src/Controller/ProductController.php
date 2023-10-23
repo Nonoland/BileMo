@@ -21,7 +21,9 @@ class ProductController extends AbstractController
     #[Route('/products', name: 'app_product_list', methods: ['GET'])]
     public function productList(): JsonResponse
     {
-        $data = $this->getProductPageSchema();
+        $data['data'] = $this->getProductPageSchema();
+        $data['links']['self'] = $this->generateUrl('app_product_list_page', ['page' => 1]);
+        $data['links']['next'] = $this->generateUrl('app_product_list_page', ['page' => 2]);
 
         return $this->json($data);
     }
@@ -29,32 +31,39 @@ class ProductController extends AbstractController
     #[Route('/products/page/{page}', name: 'app_product_list_page')]
     public function productListPage(int $page): JsonResponse
     {
-        $data = $this->getProductPageSchema($page);
+        $data['data'] = $this->getProductPageSchema($page);
+
+        if ($page != 1) {
+            $data['links']['prev'] = $this->generateUrl('app_product_list_page', ['page' => $page - 1]);
+        }
+
+        $data['links']['self'] = $this->generateUrl('app_product_list_page', ['page' => $page]);
+        $data['links']['next'] = $this->generateUrl('app_product_list_page', ['page' => $page + 1]);
 
         return $this->json($data);
     }
 
     #[Route('/products/detail/{id}', name: 'app_product_detail', methods: ['GET'])]
-    public function productDetail(ProductRepository $productRepository): JsonResponse
+    public function productDetail(Product $product): JsonResponse
     {
-       return $this->json([]);
+        $data['data'] = $product->getData();
+        $data['links']['self'] = $this->generateUrl('app_product_detail', ['id' => $product->getId()]);
+
+       return $this->json($data);
     }
 
     private function getProductPageSchema(int $page = 1): array
     {
         $products = $this->productRepository->findByPage($page);
 
-        $data = ['products' => []];
+        $data = [];
         foreach ($products as $product) {
-            $data['products'][] = [
+            $data[] = [
                 'name' => $product->getName(),
                 'gtin' => $product->getGtin(),
                 'link' => $this->generateUrl('app_product_detail', ['id' => $product->getId()])
             ];
         }
-
-        $data['count'] = count($data['products']);
-        $data['nextPage'] = $this->generateUrl('app_product_list_page', ['page' => $page + 1]);
 
         return $data;
     }
