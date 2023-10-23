@@ -32,6 +32,9 @@ class Product
     #[ORM\Column(type: Types::SIMPLE_ARRAY, nullable: true)]
     private ?array $features = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $image = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -105,6 +108,18 @@ class Product
     public function setFeatures(?array $features): static
     {
         $this->features = $features;
+
+        return $this;
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(?string $image): static
+    {
+        $this->image = $image;
 
         return $this;
     }
