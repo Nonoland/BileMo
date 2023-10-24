@@ -106,8 +106,8 @@ class CustomerController extends RouteController
         #[MapEntity(mapping: ['idStore' => 'id'])]
         Store $store,
         #[MapEntity(mapping: ['idCustomer' => 'id', 'idStore' => 'store'])]
-        Customer $customer): JsonResponse
-    {
+        Customer $customer
+    ): JsonResponse {
         $this->entityManager->remove($customer);
         $this->entityManager->flush();
 
