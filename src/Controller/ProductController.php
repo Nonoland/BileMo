@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Product;
 use App\Repository\ProductRepository;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -16,21 +17,37 @@ class ProductController extends RouteController
         $this->productRepository = $productRepository;
     }
 
-    #[Route('/products', name: 'app_products_list', methods: ['GET'])]
+    #[Route(
+        '/products',
+        name: 'app_products_list',
+        methods: ['GET']
+    )]
     public function productList(): JsonResponse
     {
         return $this->json($this->getProductPageSchema());
     }
 
-    #[Route('/products/page/{page}', name: 'app_products_list_page')]
+    #[Route(
+        '/products/page/{page}',
+        name: 'app_products_list_page',
+        requirements: ['page' => '\d+'],
+        methods: ['GET']
+    )]
     public function productListPage(int $page): JsonResponse
     {
         return $this->json($this->getProductPageSchema($page));
     }
 
-    #[Route('/products/detail/{id}', name: 'app_products_detail', methods: ['GET'])]
-    public function productDetail(Product $product): JsonResponse
-    {
+    #[Route(
+        '/products/detail/{id}',
+        name: 'app_products_detail',
+        requirements: ['id' => '\d+'],
+        methods: ['GET']
+    )]
+    public function productDetail(
+        #[MapEntity(mapping: ['id' => 'id'])]
+        Product $product
+    ): JsonResponse {
         return $this->json($this->getObjectDetail(
             $product->getData(),
             $this->generateUrl('app_products_detail', ['id' => $product->getId()])

@@ -25,39 +25,60 @@ class CustomerController extends RouteController
         $this->entityManager = $entityManager;
     }
 
-    #[Route('/store/{storeId}/customers', name: 'app_customers_list', methods: ['GET'])]
-    public function customersList(int $storeId): JsonResponse
-    {
-        return $this->json($this->getCustomerPageSchema($storeId));
+    #[Route(
+        '/store/{idStore}/customers',
+        name: 'app_customers_list',
+        requirements: ['idStore' => '\d+'],
+        methods: ['GET']
+    )]
+    public function customersList(
+        #[MapEntity(mapping: ['idStore' => 'id'])]
+        Store $store
+    ): JsonResponse {
+        return $this->json($this->getCustomerPageSchema($store));
     }
 
-    #[Route('/store/{storeId}/customers/page/{page}', name: 'app_customers_list_page')]
-    public function customerListPage(int $storeId, int $page): JsonResponse
-    {
-        return $this->json($this->getCustomerPageSchema($storeId, $page));
+    #[Route(
+        '/store/{idStore}/customers/page/{page}',
+        name: 'app_customers_list_page',
+        requirements: ['idStore' => '\d+', 'page' => '\d+'],
+        methods: ['GET']
+    )]
+    public function customerListPage(
+        #[MapEntity(mapping: ['idStore' => 'id'])]
+        Store $store,
+        int $page
+    ): JsonResponse {
+        return $this->json($this->getCustomerPageSchema($store, $page));
     }
 
-    #[Route('/store/{storeId}/customers/detail/{id}', name: 'app_customers_detail', methods: ['GET'])]
-    public function customerDetail(Customer $customer): JsonResponse
-    {
+    #[Route(
+        '/store/{idStore}/customers/detail/{id}',
+        name: 'app_customers_detail',
+        requirements: ['idStore' => '\d+', 'id' => '\d+'],
+        methods: ['GET']
+    )]
+    public function customerDetail(
+        #[MapEntity(mapping: ['idStore' => 'store', 'id' => 'id'])]
+        Customer $customer
+    ): JsonResponse {
         return $this->json($this->getObjectDetail(
             $customer->getData(),
-            $this->generateUrl('app_customers_detail', ['storeId' => $customer->getStore()->getId(), 'id' => $customer->getId()])
+            $this->generateUrl('app_customers_detail', ['idStore' => $customer->getStore()->getId(), 'id' => $customer->getId()])
         ));
     }
 
-    #[Route('/store/{storeId}/customers/add', name: 'app_customers_add', methods: ['POST'])]
-    public function createCustomer(int $storeId, Request $request): JsonResponse
-    {
-        $store = $this->storeRepository->find($storeId);
-        if (!$store) {
-            return $this->json([
-                'status' => '404',
-                'error' => 'Not Found',
-                'message' => "Store with id $storeId not found."
-            ], 404);
-        }
-
+    #[Route(
+        '/store/{idStore}/customers/add',
+        name: 'app_customers_add',
+        requirements: ['idStore' => '\d+'],
+        methods: ['POST']
+    )]
+    public function createCustomer(
+        #[MapEntity(mapping: ['idStore' => 'id'])]
+        Store $store,
+        Request $request
+    ): JsonResponse {
         $params = ['lastname', 'firstname', 'email'];
         foreach ($params as $param) {
             if (!array_key_exists($param, $request->request->all())) {
@@ -103,8 +124,6 @@ class CustomerController extends RouteController
         methods: ['DELETE']
     )]
     public function deleteCustomer(
-        #[MapEntity(mapping: ['idStore' => 'id'])]
-        Store $store,
         #[MapEntity(mapping: ['idCustomer' => 'id', 'idStore' => 'store'])]
         Customer $customer
     ): JsonResponse {
@@ -117,9 +136,9 @@ class CustomerController extends RouteController
         ]);
     }
 
-    private function getCustomerPageSchema(int $storeId, int $page = 1): array
+    private function getCustomerPageSchema(Store $store, int $page = 1): array
     {
-        $customers = $this->customerRepository->findByPage($storeId, $page);
+        $customers = $this->customerRepository->findByPage($store, $page);
 
         $data['data'] = [];
         /** @var Customer $customer */
@@ -129,16 +148,16 @@ class CustomerController extends RouteController
                 'lastname' => $customer->getLastname(),
                 'firstname' => $customer->getFirstname(),
                 'email' => $customer->getEmail(),
-                'link' => $this->generateUrl('app_customers_detail', ['storeId' => $storeId, 'id' => $customer->getId()])
+                'link' => $this->generateUrl('app_customers_detail', ['storeId' => $store->getId(), 'id' => $customer->getId()])
             ];
         }
 
         if ($page != 1) {
-            $data['links']['prev'] = $this->generateUrl('app_customers_list_page', ['storeId' => $storeId, 'page' => $page - 1]);
+            $data['links']['prev'] = $this->generateUrl('app_customers_list_page', ['storeId' => $store->getId(), 'page' => $page - 1]);
         }
 
-        $data['links']['self'] = $this->generateUrl('app_customers_list_page', ['storeId' => $storeId, 'page' => $page]);
-        $data['links']['next'] = $this->generateUrl('app_customers_list_page', ['storeId' => $storeId, 'page' => $page + 1]);
+        $data['links']['self'] = $this->generateUrl('app_customers_list_page', ['storeId' => $store->getId(), 'page' => $page]);
+        $data['links']['next'] = $this->generateUrl('app_customers_list_page', ['storeId' => $store->getId(), 'page' => $page + 1]);
 
         return $data;
     }

@@ -17,17 +17,13 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class CustomerRepository extends ServiceEntityRepository
 {
-    private StoreRepository $storeRepository;
-    public function __construct(ManagerRegistry $registry, StoreRepository $storeRepository)
+    public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Customer::class);
-        $this->storeRepository = $storeRepository;
     }
 
-    public function findByPage(int $storeId, int $page, int $maxPerPage = 10)
+    public function findByPage(Store $store, int $page, int $maxPerPage = 10)
     {
-        $store = $this->storeRepository->find($storeId);
-
         return $this->createQueryBuilder('p')
             ->where('p.store = :store')
             ->setParameter('store', $store)
