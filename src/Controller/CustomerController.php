@@ -30,7 +30,7 @@ class CustomerController extends AbstractController
     }
 
     #[Route('/customers/detail/{id}', name: 'app_customers_detail', methods: ['GET'])]
-    public function productDetail(Customer $customer): JsonResponse
+    public function customerDetail(Customer $customer): JsonResponse
     {
         $data['data'] = $customer->getData();
         $data['links']['self'] = $this->generateUrl('app_customers_detail', ['id' => $customer->getId()]);
