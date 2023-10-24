@@ -4,11 +4,10 @@ namespace App\Controller;
 
 use App\Entity\Customer;
 use App\Repository\CustomerRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
-class CustomerController extends AbstractController
+class CustomerController extends RouteController
 {
     private CustomerRepository $customerRepository;
 
@@ -32,10 +31,10 @@ class CustomerController extends AbstractController
     #[Route('/customers/detail/{id}', name: 'app_customers_detail', methods: ['GET'])]
     public function customerDetail(Customer $customer): JsonResponse
     {
-        $data['data'] = $customer->getData();
-        $data['links']['self'] = $this->generateUrl('app_customers_detail', ['id' => $customer->getId()]);
-
-        return $this->json($data);
+        return $this->json($this->getObjectDetail(
+            $customer->getData(),
+            $this->generateUrl('app_customers_detail', ['id' => $customer->getId()])
+        ));
     }
 
     private function getCustomerPageSchema(int $page = 1): array

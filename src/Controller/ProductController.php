@@ -4,11 +4,10 @@ namespace App\Controller;
 
 use App\Entity\Product;
 use App\Repository\ProductRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
-class ProductController extends AbstractController
+class ProductController extends RouteController
 {
     private ProductRepository $productRepository;
 
@@ -32,10 +31,10 @@ class ProductController extends AbstractController
     #[Route('/products/detail/{id}', name: 'app_products_detail', methods: ['GET'])]
     public function productDetail(Product $product): JsonResponse
     {
-        $data['data'] = $product->getData();
-        $data['links']['self'] = $this->generateUrl('app_products_detail', ['id' => $product->getId()]);
-
-        return $this->json($data);
+        return $this->json($this->getObjectDetail(
+            $product->getData(),
+            $this->generateUrl('app_products_detail', ['id' => $product->getId()])
+        ));
     }
 
     private function getProductPageSchema(int $page = 1): array
