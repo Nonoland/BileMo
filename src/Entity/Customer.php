@@ -77,4 +77,16 @@ class Customer
 
         return $this;
     }
+
+    public function getData(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'lastname' => $this->getLastname(),
+            'firstname' => $this->getFirstname(),
+            'email' => $this->getEmail(),
+            'store_id' => $this->store->getId(),
+            'store_name' => $this->store->getName()
+        ];
+    }
 }
