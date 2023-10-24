@@ -3,9 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Customer;
+use App\Entity\Store;
 use App\Repository\CustomerRepository;
 use App\Repository\StoreRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -92,6 +94,27 @@ class CustomerController extends RouteController
             'message' => 'Customer successfully created',
             'data' => $customer->getData()
         ], 201);
+    }
+
+    #[Route(
+        '/store/{idStore}/customers/{idCustomer}/delete',
+        name: "app_customers_delete",
+        requirements: ['idStore' => '\d+', 'idCustomer' => '\d+'],
+        methods: ['DELETE']
+    )]
+    public function deleteCustomer(
+        #[MapEntity(mapping: ['idStore' => 'id'])]
+        Store $store,
+        #[MapEntity(mapping: ['idCustomer' => 'id', 'idStore' => 'store'])]
+        Customer $customer): JsonResponse
+    {
+        $this->entityManager->remove($customer);
+        $this->entityManager->flush();
+
+        return $this->json([
+            'status' => 200,
+            'message' => 'Customer successfully removed'
+        ]);
     }
 
     private function getCustomerPageSchema(int $storeId, int $page = 1): array
