@@ -3,7 +3,6 @@
 namespace App\Command;
 
 use App\Entity\Product;
-use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
