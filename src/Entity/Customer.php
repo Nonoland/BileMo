@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\CustomerRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints\Email;
 
 #[ORM\Entity(repositoryClass: CustomerRepository::class)]
 class Customer
@@ -20,6 +21,7 @@ class Customer
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255)]
+    #[Email]
     private ?string $email = null;
 
     #[ORM\ManyToOne(inversedBy: 'customers')]

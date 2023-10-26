@@ -21,9 +21,13 @@ class Store
     #[ORM\OneToMany(mappedBy: 'store', targetEntity: Customer::class)]
     private Collection $customers;
 
+    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'stores')]
+    private Collection $users;
+
     public function __construct()
     {
         $this->customers = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -68,6 +72,38 @@ class Store
             if ($customer->getStore() === $this) {
                 $customer->setStore(null);
             }
+        }
+
+        return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->getName();
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+    public function addUser(User $user): static
+    {
+        if (!$this->users->contains($user)) {
+            $this->users->add($user);
+            $user->addStore($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUser(User $user): static
+    {
+        if ($this->users->removeElement($user)) {
+            $user->removeStore($this);
         }
 
         return $this;
