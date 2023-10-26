@@ -8,8 +8,10 @@ use App\Repository\CustomerRepository;
 use App\Repository\StoreRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
+use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/api', name: 'api_')]
@@ -36,6 +38,8 @@ class CustomerController extends RouteController
         #[MapEntity(mapping: ['idStore' => 'id'])]
         Store $store
     ): JsonResponse {
+        $this->verifyAccess($store);
+
         return $this->json($this->getCustomerPageSchema($store));
     }
 
@@ -50,6 +54,8 @@ class CustomerController extends RouteController
         Store $store,
         int $page
     ): JsonResponse {
+        $this->verifyAccess($store);
+
         return $this->json($this->getCustomerPageSchema($store, $page));
     }
 
@@ -61,8 +67,12 @@ class CustomerController extends RouteController
     )]
     public function customerDetail(
         #[MapEntity(mapping: ['idStore' => 'store', 'idCustomer' => 'id'])]
-        Customer $customer
+        Customer $customer,
+        #[MapEntity(mapping: ['idStore' => 'id'])]
+        Store $store
     ): JsonResponse {
+        $this->verifyAccess($store);
+
         return $this->json($this->getObjectDetail(
             $customer->getData(),
             $this->generateUrl('api_app_customers_detail', ['idStore' => $customer->getStore()->getId(), 'idCustomer' => $customer->getId()])
@@ -80,6 +90,8 @@ class CustomerController extends RouteController
         Store $store,
         Request $request
     ): JsonResponse {
+        $this->verifyAccess($store);
+
         $params = ['lastname', 'firstname', 'email'];
         foreach ($params as $param) {
             if (!array_key_exists($param, $request->request->all())) {
@@ -126,8 +138,12 @@ class CustomerController extends RouteController
     )]
     public function deleteCustomer(
         #[MapEntity(mapping: ['idCustomer' => 'id', 'idStore' => 'store'])]
-        Customer $customer
+        Customer $customer,
+        #[MapEntity(mapping: ['idStore' => 'id'])]
+        Store $store
     ): JsonResponse {
+        $this->verifyAccess($store);
+
         $this->entityManager->remove($customer);
         $this->entityManager->flush();
 
@@ -161,5 +177,18 @@ class CustomerController extends RouteController
         $data['links']['next'] = $this->generateUrl('api_app_customers_list_page', ['idStore' => $store->getId(), 'page' => $page + 1]);
 
         return $data;
+    }
+
+    private function verifyAccess(Store $store): void
+    {
+        if (in_array('ROLE_ADMIN', $this->getUser()->getRoles())) {
+            return;
+        }
+
+        if ($this->getUser()->getStores()->contains($store)) {
+            return;
+        }
+
+        throw new AccessDeniedHttpException('Access denied !');
     }
 }
