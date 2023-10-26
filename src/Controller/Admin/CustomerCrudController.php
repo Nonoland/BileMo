@@ -21,7 +21,7 @@ class CustomerCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        $fields = [
+        return [
             IdField::new('id')->hideOnForm(),
             TextField::new('lastname'),
             TextField::new('firstname'),
@@ -33,7 +33,5 @@ class CustomerCrudController extends AbstractCrudController
                     'choice_label' => 'name'
                 ])
         ];
-
-        return $fields;
     }
 }
