@@ -15,7 +15,7 @@ class StoreFixtures extends Fixture implements DependentFixtureInterface
         $faker = Factory::create();
 
         //Generate stores
-        for($i = 1; $i < 10; $i++) {
+        for ($i = 1; $i < 10; $i++) {
             $store = new Store();
             $store->setName($faker->domainWord());
             $manager->persist($store);

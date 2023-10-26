@@ -20,7 +20,7 @@ class CustomerFixtures extends Fixture implements DependentFixtureInterface
         $storesCount = count($stores);
 
         //Generate customer
-        for($i = 1; $i < 5000; $i++) {
+        for ($i = 1; $i < 5000; $i++) {
             $customer = new Customer();
             $customer->setEmail($faker->freeEmail());
             $customer->setLastname($faker->lastName());
