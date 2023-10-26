@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Customer;
 use App\Entity\Product;
 use App\Entity\Store;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
@@ -34,5 +35,6 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::section();
         yield MenuItem::linkToCrud('Products', 'fas fa-box', Product::class);
         yield MenuItem::linkToCrud('Stores', 'fas fa-store', Store::class);
+        yield MenuItem::linkToCrud('Customers', 'fas fa-person', Customer::class);
     }
 }
