@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Api;
 
 use App\Entity\Customer;
 use App\Entity\Store;
@@ -8,10 +8,13 @@ use App\Repository\CustomerRepository;
 use App\Repository\StoreRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
+use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
+#[Route('/api', name: 'api_')]
 class CustomerController extends RouteController
 {
     private CustomerRepository $customerRepository;
@@ -35,6 +38,8 @@ class CustomerController extends RouteController
         #[MapEntity(mapping: ['idStore' => 'id'])]
         Store $store
     ): JsonResponse {
+        $this->verifyAccess($store);
+
         return $this->json($this->getCustomerPageSchema($store));
     }
 
@@ -49,22 +54,28 @@ class CustomerController extends RouteController
         Store $store,
         int $page
     ): JsonResponse {
+        $this->verifyAccess($store);
+
         return $this->json($this->getCustomerPageSchema($store, $page));
     }
 
     #[Route(
-        '/store/{idStore}/customers/detail/{id}',
+        '/store/{idStore}/customers/detail/{idCustomer}',
         name: 'app_customers_detail',
-        requirements: ['idStore' => '\d+', 'id' => '\d+'],
+        requirements: ['idStore' => '\d+', 'idCustomer' => '\d+'],
         methods: ['GET']
     )]
     public function customerDetail(
-        #[MapEntity(mapping: ['idStore' => 'store', 'id' => 'id'])]
-        Customer $customer
+        #[MapEntity(mapping: ['idStore' => 'store', 'idCustomer' => 'id'])]
+        Customer $customer,
+        #[MapEntity(mapping: ['idStore' => 'id'])]
+        Store $store
     ): JsonResponse {
+        $this->verifyAccess($store);
+
         return $this->json($this->getObjectDetail(
             $customer->getData(),
-            $this->generateUrl('app_customers_detail', ['idStore' => $customer->getStore()->getId(), 'id' => $customer->getId()])
+            $this->generateUrl('api_app_customers_detail', ['idStore' => $customer->getStore()->getId(), 'idCustomer' => $customer->getId()])
         ));
     }
 
@@ -79,6 +90,8 @@ class CustomerController extends RouteController
         Store $store,
         Request $request
     ): JsonResponse {
+        $this->verifyAccess($store);
+
         $params = ['lastname', 'firstname', 'email'];
         foreach ($params as $param) {
             if (!array_key_exists($param, $request->request->all())) {
@@ -125,8 +138,12 @@ class CustomerController extends RouteController
     )]
     public function deleteCustomer(
         #[MapEntity(mapping: ['idCustomer' => 'id', 'idStore' => 'store'])]
-        Customer $customer
+        Customer $customer,
+        #[MapEntity(mapping: ['idStore' => 'id'])]
+        Store $store
     ): JsonResponse {
+        $this->verifyAccess($store);
+
         $this->entityManager->remove($customer);
         $this->entityManager->flush();
 
@@ -148,17 +165,30 @@ class CustomerController extends RouteController
                 'lastname' => $customer->getLastname(),
                 'firstname' => $customer->getFirstname(),
                 'email' => $customer->getEmail(),
-                'link' => $this->generateUrl('app_customers_detail', ['storeId' => $store->getId(), 'id' => $customer->getId()])
+                'link' => $this->generateUrl('api_app_customers_detail', ['idStore' => $store->getId(), 'idCustomer' => $customer->getId()])
             ];
         }
 
         if ($page != 1) {
-            $data['links']['prev'] = $this->generateUrl('app_customers_list_page', ['storeId' => $store->getId(), 'page' => $page - 1]);
+            $data['links']['prev'] = $this->generateUrl('api_app_customers_list_page', ['idStore' => $store->getId(), 'page' => $page - 1]);
         }
 
-        $data['links']['self'] = $this->generateUrl('app_customers_list_page', ['storeId' => $store->getId(), 'page' => $page]);
-        $data['links']['next'] = $this->generateUrl('app_customers_list_page', ['storeId' => $store->getId(), 'page' => $page + 1]);
+        $data['links']['self'] = $this->generateUrl('api_app_customers_list_page', ['idStore' => $store->getId(), 'page' => $page]);
+        $data['links']['next'] = $this->generateUrl('api_app_customers_list_page', ['idStore' => $store->getId(), 'page' => $page + 1]);
 
         return $data;
+    }
+
+    private function verifyAccess(Store $store): void
+    {
+        if (in_array('ROLE_ADMIN', $this->getUser()->getRoles())) {
+            return;
+        }
+
+        if ($this->getUser()->getStores()->contains($store)) {
+            return;
+        }
+
+        throw new AccessDeniedHttpException('Access denied !');
     }
 }
