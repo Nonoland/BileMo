@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
+#[Route('/api', name: 'api_')]
 class CustomerController extends RouteController
 {
     private CustomerRepository $customerRepository;
@@ -64,7 +65,7 @@ class CustomerController extends RouteController
     ): JsonResponse {
         return $this->json($this->getObjectDetail(
             $customer->getData(),
-            $this->generateUrl('app_customers_detail', ['idStore' => $customer->getStore()->getId(), 'idCustomer' => $customer->getId()])
+            $this->generateUrl('api_app_customers_detail', ['idStore' => $customer->getStore()->getId(), 'idCustomer' => $customer->getId()])
         ));
     }
 
@@ -148,16 +149,16 @@ class CustomerController extends RouteController
                 'lastname' => $customer->getLastname(),
                 'firstname' => $customer->getFirstname(),
                 'email' => $customer->getEmail(),
-                'link' => $this->generateUrl('app_customers_detail', ['idStore' => $store->getId(), 'idCustomer' => $customer->getId()])
+                'link' => $this->generateUrl('api_app_customers_detail', ['idStore' => $store->getId(), 'idCustomer' => $customer->getId()])
             ];
         }
 
         if ($page != 1) {
-            $data['links']['prev'] = $this->generateUrl('app_customers_list_page', ['idStore' => $store->getId(), 'page' => $page - 1]);
+            $data['links']['prev'] = $this->generateUrl('api_app_customers_list_page', ['idStore' => $store->getId(), 'page' => $page - 1]);
         }
 
-        $data['links']['self'] = $this->generateUrl('app_customers_list_page', ['idStore' => $store->getId(), 'page' => $page]);
-        $data['links']['next'] = $this->generateUrl('app_customers_list_page', ['idStore' => $store->getId(), 'page' => $page + 1]);
+        $data['links']['self'] = $this->generateUrl('api_app_customers_list_page', ['idStore' => $store->getId(), 'page' => $page]);
+        $data['links']['next'] = $this->generateUrl('api_app_customers_list_page', ['idStore' => $store->getId(), 'page' => $page + 1]);
 
         return $data;
     }

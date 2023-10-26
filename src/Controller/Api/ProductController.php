@@ -8,6 +8,7 @@ use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
+#[Route('/api', name: 'api_')]
 class ProductController extends RouteController
 {
     private ProductRepository $productRepository;
@@ -50,7 +51,7 @@ class ProductController extends RouteController
     ): JsonResponse {
         return $this->json($this->getObjectDetail(
             $product->getData(),
-            $this->generateUrl('app_products_detail', ['id' => $product->getId()])
+            $this->generateUrl('api_app_products_detail', ['id' => $product->getId()])
         ));
     }
 
@@ -63,16 +64,16 @@ class ProductController extends RouteController
             $data['data'][] = [
                 'name' => $product->getName(),
                 'gtin' => $product->getGtin(),
-                'link' => $this->generateUrl('app_products_detail', ['id' => $product->getId()])
+                'link' => $this->generateUrl('api_app_products_detail', ['id' => $product->getId()])
             ];
         }
 
         if ($page != 1) {
-            $data['links']['prev'] = $this->generateUrl('app_products_list_page', ['page' => $page - 1]);
+            $data['links']['prev'] = $this->generateUrl('api_app_products_list_page', ['page' => $page - 1]);
         }
 
-        $data['links']['self'] = $this->generateUrl('app_products_list_page', ['page' => $page]);
-        $data['links']['next'] = $this->generateUrl('app_products_list_page', ['page' => $page + 1]);
+        $data['links']['self'] = $this->generateUrl('api_app_products_list_page', ['page' => $page]);
+        $data['links']['next'] = $this->generateUrl('api_app_products_list_page', ['page' => $page + 1]);
 
         return $data;
     }
