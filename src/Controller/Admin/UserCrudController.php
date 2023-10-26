@@ -10,6 +10,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
@@ -34,38 +36,25 @@ class UserCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        $stores = AssociationField::new('stores')
-            ->setLabel('Stores')
-            ->setFormTypeOptions([
-                'class' => Store::class,
-                'choice_label' => 'name'
-            ])
-        ;
-
-        $password = TextField::new('password')
-            ->setFormType(RepeatedType::class)
-            ->setFormTypeOptions([
-                'type' => PasswordType::class,
-                'first_options' => ['label' => 'Password'],
-                'second_options' => ['label' => '(Repeat)'],
-                'mapped' => false
-            ])
-            ->setRequired($pageName === Crud::PAGE_NEW)
-            ->onlyOnForms()
-        ;
-
-        if (Crud::PAGE_EDIT === $pageName || Crud::PAGE_NEW === $pageName) {
-            return [
-                'email',
-                $stores,
-                $password
-            ];
-        }
-
         return [
-            'id',
-            'email',
-            $stores
+            IdField::new('id')->hideOnForm(),
+            EmailField::new('email'),
+            TextField::new('password')
+                ->setFormType(RepeatedType::class)
+                ->setFormTypeOptions([
+                    'type' => PasswordType::class,
+                    'first_options' => ['label' => 'Password'],
+                    'second_options' => ['label' => '(Repeat)'],
+                    'mapped' => false
+                ])
+                ->setRequired($pageName === Crud::PAGE_NEW)
+                ->onlyOnForms(),
+            AssociationField::new('stores')
+                ->setLabel('Stores')
+                ->setFormTypeOptions([
+                    'class' => Store::class,
+                    'choice_label' => 'name'
+                ])
         ];
     }
 
