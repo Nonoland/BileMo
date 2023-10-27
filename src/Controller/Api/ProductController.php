@@ -56,6 +56,7 @@ class ProductController extends RouteController
     ): JsonResponse {
         return $this->json($this->getObjectDetail(
             $this->cache->get("productDetail_" . $product->getId(), function (ItemInterface $item) use ($product) {
+                $item->tag('productsDetails');
                 return $product->getData();
             }),
             $this->generateUrl('api_app_products_detail', ['id' => $product->getId()])
@@ -65,7 +66,7 @@ class ProductController extends RouteController
     private function getProductPageSchema(int $page = 1): array
     {
         return $this->cache->get("getProductPageSchema_$page", function (ItemInterface $item) use ($page) {
-            $item->tag('productsList');
+            $item->tag('productsLists');
 
             $products = $this->productRepository->findByPage($page);
 
