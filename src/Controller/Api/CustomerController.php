@@ -149,8 +149,6 @@ class CustomerController extends RouteController
     ): JsonResponse {
         $this->verifyAccess($store);
 
-        $this->cache->invalidateTags(['customersDetails', 'customersLists']);
-
         $this->entityManager->remove($customer);
         $this->entityManager->flush();
 

@@ -5,8 +5,10 @@ namespace App\Entity;
 use App\Repository\ProductRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Product
 {
     #[ORM\Id]
@@ -40,6 +42,11 @@ class Product
 
     #[ORM\Column(length: 14)]
     private ?string $gtin = null;
+
+    public function __construct(
+        private TagAwareCacheInterface $cache,
+    ) {
+    }
 
     public function getId(): ?int
     {
@@ -168,5 +175,11 @@ class Product
             'description' => $this->getDescription(),
             'features' => $this->getFeatures()
         ];
+    }
+
+    #[ORM\PostPersist]
+    public function clearCache()
+    {
+        $this->cache->invalidateTags(["productsLists", "productsDetails"]);
     }
 }
