@@ -108,4 +108,11 @@ class Store
 
         return $this;
     }
+
+    public function getData()
+    {
+        return [
+            'name' => $this->getName()
+        ];
+    }
 }

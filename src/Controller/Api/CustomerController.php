@@ -8,10 +8,8 @@ use App\Repository\CustomerRepository;
 use App\Repository\StoreRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
-use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/api', name: 'api_')]
@@ -177,18 +175,5 @@ class CustomerController extends RouteController
         $data['links']['next'] = $this->generateUrl('api_app_customers_list_page', ['idStore' => $store->getId(), 'page' => $page + 1]);
 
         return $data;
-    }
-
-    private function verifyAccess(Store $store): void
-    {
-        if (in_array('ROLE_ADMIN', $this->getUser()->getRoles())) {
-            return;
-        }
-
-        if ($this->getUser()->getStores()->contains($store)) {
-            return;
-        }
-
-        throw new AccessDeniedHttpException('Access denied !');
     }
 }
