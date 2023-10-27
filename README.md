@@ -32,7 +32,7 @@ cp .env.dist .env
 
 4. Ouvrez le fichier .env et modifiez la ligne `DATABASE_URL` avec vos informations de connexion à la base de données.
 
-5. Générer les clé privée et publique pour l'authentification par JWT
+5. Générer les clés privée et publique pour l'authentification par JWT
 
 ```bash
 php bin/console lexik:jwt:generate-keypair
