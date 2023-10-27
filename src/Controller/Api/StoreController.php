@@ -51,6 +51,8 @@ class StoreController extends RouteController
         #[MapEntity(mapping: ['idStore' => 'id'])]
         Store $store
     ): JsonResponse {
+        $this->verifyAccess($store);
+
         return $this->json($this->getObjectDetail(
             $store->getData(),
             $this->generateUrl('api_app_stores_detail', ['idStore' => $store->getId()])
