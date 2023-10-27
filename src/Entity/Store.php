@@ -6,8 +6,10 @@ use App\Repository\StoreRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 #[ORM\Entity(repositoryClass: StoreRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Store
 {
     #[ORM\Id]
@@ -24,8 +26,9 @@ class Store
     #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'stores')]
     private Collection $users;
 
-    public function __construct()
-    {
+    public function __construct(
+        private TagAwareCacheInterface $cache
+    ) {
         $this->customers = new ArrayCollection();
         $this->users = new ArrayCollection();
     }
@@ -114,5 +117,11 @@ class Store
         return [
             'name' => $this->getName()
         ];
+    }
+
+    #[ORM\PostPersist]
+    public function clearCache()
+    {
+        $this->cache->invalidateTags(["storeLists", "storesDetails"]);
     }
 }

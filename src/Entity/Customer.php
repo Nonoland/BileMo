@@ -5,8 +5,10 @@ namespace App\Entity;
 use App\Repository\CustomerRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 #[ORM\Entity(repositoryClass: CustomerRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Customer
 {
     #[ORM\Id]
@@ -26,6 +28,11 @@ class Customer
 
     #[ORM\ManyToOne(inversedBy: 'customers')]
     private ?Store $store = null;
+
+    public function __construct(
+        private TagAwareCacheInterface $cache,
+    ) {
+    }
 
     public function getId(): ?int
     {
@@ -90,5 +97,11 @@ class Customer
             'store_id' => $this->store->getId(),
             'store_name' => $this->store->getName()
         ];
+    }
+
+    #[ORM\PostPersist]
+    public function clearCache()
+    {
+        $this->cache->invalidateTags(["customersLists", "customersDetails"]);
     }
 }

@@ -4,18 +4,23 @@ namespace App\Controller\Api;
 
 use App\Entity\Product;
 use App\Repository\ProductRepository;
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 #[Route('/api', name: 'api_')]
 class ProductController extends RouteController
 {
     private ProductRepository $productRepository;
+    private TagAwareCacheInterface $cache;
 
-    public function __construct(ProductRepository $productRepository)
+    public function __construct(ProductRepository $productRepository, TagAwareCacheInterface $cache)
     {
         $this->productRepository = $productRepository;
+        $this->cache = $cache;
     }
 
     #[Route(
@@ -50,31 +55,38 @@ class ProductController extends RouteController
         Product $product
     ): JsonResponse {
         return $this->json($this->getObjectDetail(
-            $product->getData(),
+            $this->cache->get("productDetail_" . $product->getId(), function (ItemInterface $item) use ($product) {
+                $item->tag('productsDetails');
+                return $product->getData();
+            }),
             $this->generateUrl('api_app_products_detail', ['id' => $product->getId()])
         ));
     }
 
     private function getProductPageSchema(int $page = 1): array
     {
-        $products = $this->productRepository->findByPage($page);
+        return $this->cache->get("getProductPageSchema_$page", function (ItemInterface $item) use ($page) {
+            $item->tag('productsLists');
 
-        $data['data'] = [];
-        foreach ($products as $product) {
-            $data['data'][] = [
-                'name' => $product->getName(),
-                'gtin' => $product->getGtin(),
-                'link' => $this->generateUrl('api_app_products_detail', ['id' => $product->getId()])
-            ];
-        }
+            $products = $this->productRepository->findByPage($page);
 
-        if ($page != 1) {
-            $data['links']['prev'] = $this->generateUrl('api_app_products_list_page', ['page' => $page - 1]);
-        }
+            $data['data'] = [];
+            foreach ($products as $product) {
+                $data['data'][] = [
+                    'name' => $product->getName(),
+                    'gtin' => $product->getGtin(),
+                    'link' => $this->generateUrl('api_app_products_detail', ['id' => $product->getId()])
+                ];
+            }
 
-        $data['links']['self'] = $this->generateUrl('api_app_products_list_page', ['page' => $page]);
-        $data['links']['next'] = $this->generateUrl('api_app_products_list_page', ['page' => $page + 1]);
+            if ($page != 1) {
+                $data['links']['prev'] = $this->generateUrl('api_app_products_list_page', ['page' => $page - 1]);
+            }
 
-        return $data;
+            $data['links']['self'] = $this->generateUrl('api_app_products_list_page', ['page' => $page]);
+            $data['links']['next'] = $this->generateUrl('api_app_products_list_page', ['page' => $page + 1]);
+
+            return $data;
+        });
     }
 }

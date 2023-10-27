@@ -5,25 +5,29 @@ namespace App\Controller\Api;
 use App\Entity\Customer;
 use App\Entity\Store;
 use App\Repository\CustomerRepository;
-use App\Repository\StoreRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 #[Route('/api', name: 'api_')]
 class CustomerController extends RouteController
 {
     private CustomerRepository $customerRepository;
-    private StoreRepository $storeRepository;
     private EntityManagerInterface $entityManager;
+    private TagAwareCacheInterface $cache;
 
-    public function __construct(CustomerRepository $customerRepository, StoreRepository $storeRepository, EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        CustomerRepository $customerRepository,
+        EntityManagerInterface $entityManager,
+        TagAwareCacheInterface $cache
+    ) {
         $this->customerRepository = $customerRepository;
-        $this->storeRepository = $storeRepository;
         $this->entityManager = $entityManager;
+        $this->cache = $cache;
     }
 
     #[Route(
@@ -72,7 +76,10 @@ class CustomerController extends RouteController
         $this->verifyAccess($store);
 
         return $this->json($this->getObjectDetail(
-            $customer->getData(),
+            $this->cache->get('customerDetail_' . $customer->getId(), function (ItemInterface $item) use ($customer) {
+                $item->tag('customersDetails');
+                return $customer->getData();
+            }),
             $this->generateUrl('api_app_customers_detail', ['idStore' => $customer->getStore()->getId(), 'idCustomer' => $customer->getId()])
         ));
     }
@@ -153,27 +160,31 @@ class CustomerController extends RouteController
 
     private function getCustomerPageSchema(Store $store, int $page = 1): array
     {
-        $customers = $this->customerRepository->findByPage($store, $page);
+        return $this->cache->get('getCustomerPageSchema_' . $store->getName() . "_$page", function (ItemInterface $item) use ($store, $page) {
+            $item->tag('customersLists');
 
-        $data['data'] = [];
-        /** @var Customer $customer */
-        foreach ($customers as $customer) {
-            $data['data'][] = [
-                'id' => $customer->getId(),
-                'lastname' => $customer->getLastname(),
-                'firstname' => $customer->getFirstname(),
-                'email' => $customer->getEmail(),
-                'link' => $this->generateUrl('api_app_customers_detail', ['idStore' => $store->getId(), 'idCustomer' => $customer->getId()])
-            ];
-        }
+            $customers = $this->customerRepository->findByPage($store, $page);
 
-        if ($page != 1) {
-            $data['links']['prev'] = $this->generateUrl('api_app_customers_list_page', ['idStore' => $store->getId(), 'page' => $page - 1]);
-        }
+            $data['data'] = [];
+            /** @var Customer $customer */
+            foreach ($customers as $customer) {
+                $data['data'][] = [
+                    'id' => $customer->getId(),
+                    'lastname' => $customer->getLastname(),
+                    'firstname' => $customer->getFirstname(),
+                    'email' => $customer->getEmail(),
+                    'link' => $this->generateUrl('api_app_customers_detail', ['idStore' => $store->getId(), 'idCustomer' => $customer->getId()])
+                ];
+            }
 
-        $data['links']['self'] = $this->generateUrl('api_app_customers_list_page', ['idStore' => $store->getId(), 'page' => $page]);
-        $data['links']['next'] = $this->generateUrl('api_app_customers_list_page', ['idStore' => $store->getId(), 'page' => $page + 1]);
+            if ($page != 1) {
+                $data['links']['prev'] = $this->generateUrl('api_app_customers_list_page', ['idStore' => $store->getId(), 'page' => $page - 1]);
+            }
 
-        return $data;
+            $data['links']['self'] = $this->generateUrl('api_app_customers_list_page', ['idStore' => $store->getId(), 'page' => $page]);
+            $data['links']['next'] = $this->generateUrl('api_app_customers_list_page', ['idStore' => $store->getId(), 'page' => $page + 1]);
+
+            return $data;
+        });
     }
 }
