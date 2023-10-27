@@ -32,28 +32,34 @@ cp .env.dist .env
 
 4. Ouvrez le fichier .env et modifiez la ligne `DATABASE_URL` avec vos informations de connexion à la base de données.
 
-5. Créez la base de données :
+5. Générer les clé privée et publique pour l'authentification par JWT
+
+```bash
+php bin/console lexik:jwt:generate-keypair
+```
+
+6. Créez la base de données :
 
 ```bash
 php bin/console doctrine:database:create
 ```
 
-6. Exécutez les migrations pour créer les tables dans votre base de données :
+7. Exécutez les migrations pour créer les tables dans votre base de données :
 
 ```bash
 php bin/console doctrine:migrations:migrate
 ```
 
-7. Générer le jeu de données dans votre base de données.
+8. Générer le jeu de données dans votre base de données.
 
 ```bash
 php bin/console doctrine:fixtures:load
 ```
 
-8. Lancez le serveur Symfony :
+9. Lancez le serveur Symfony :
 
 ```bash
 symfony server:start
 ```
 
-9. Vous pouvez maintenant accéder à l'application à l'adresse http://localhost:8000
+10. Vous pouvez maintenant accéder à l'application à l'adresse http://localhost:8000
