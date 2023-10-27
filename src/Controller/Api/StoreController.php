@@ -2,9 +2,7 @@
 
 namespace App\Controller\Api;
 
-use App\Entity\Product;
 use App\Entity\Store;
-use App\Repository\ProductRepository;
 use App\Repository\StoreRepository;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Component\HttpFoundation\JsonResponse;
