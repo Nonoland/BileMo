@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use App\Entity\Store;
 use App\Repository\StoreRepository;
+use OpenApi\Attributes as OA;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -11,6 +12,7 @@ use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 #[Route('/api', name: 'api_')]
+#[OA\Tag('Store')]
 class StoreController extends RouteController
 {
 
@@ -27,6 +29,11 @@ class StoreController extends RouteController
         name: 'app_stores_list',
         methods: ['GET']
     )]
+    #[OA\Get(summary: 'Get stores list')]
+    #[OA\Response(
+        response: 200,
+        description: 'Get stores list',
+    )]
     public function storeList(): JsonResponse
     {
         return $this->json($this->getStorePageSchema());
@@ -38,6 +45,11 @@ class StoreController extends RouteController
         requirements: ['page' => '\d+'],
         methods: ['GET']
     )]
+    #[OA\Get(summary: 'Get stores list with page selector')]
+    #[OA\Response(
+        response: 200,
+        description: 'Get stores list with page selector',
+    )]
     public function storeListPage(int $page): JsonResponse
     {
         return $this->json($this->getStorePageSchema($page));
@@ -48,6 +60,11 @@ class StoreController extends RouteController
         name: 'app_stores_detail',
         requirements: ['idStore' => '\d+'],
         methods: ['GET']
+    )]
+    #[OA\Get(summary: 'Get store details')]
+    #[OA\Response(
+        response: 200,
+        description: 'Get store details',
     )]
     public function storeDetail(
         #[MapEntity(mapping: ['idStore' => 'id'])]

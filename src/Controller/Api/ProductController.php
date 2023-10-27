@@ -4,7 +4,7 @@ namespace App\Controller\Api;
 
 use App\Entity\Product;
 use App\Repository\ProductRepository;
-use Psr\Cache\InvalidArgumentException;
+use OpenApi\Attributes as OA;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -12,6 +12,7 @@ use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 #[Route('/api', name: 'api_')]
+#[OA\Tag('Product')]
 class ProductController extends RouteController
 {
     private ProductRepository $productRepository;
@@ -28,6 +29,11 @@ class ProductController extends RouteController
         name: 'app_products_list',
         methods: ['GET']
     )]
+    #[OA\Get(summary: 'Get products list')]
+    #[OA\Response(
+        response: 200,
+        description: 'Get products list',
+    )]
     public function productList(): JsonResponse
     {
         return $this->json($this->getProductPageSchema());
@@ -39,6 +45,11 @@ class ProductController extends RouteController
         requirements: ['page' => '\d+'],
         methods: ['GET']
     )]
+    #[OA\Get(summary: 'Get products list with page selector')]
+    #[OA\Response(
+        response: 200,
+        description: 'Get products list with page selector',
+    )]
     public function productListPage(int $page): JsonResponse
     {
         return $this->json($this->getProductPageSchema($page));
@@ -49,6 +60,11 @@ class ProductController extends RouteController
         name: 'app_products_detail',
         requirements: ['idProduct' => '\d+'],
         methods: ['GET']
+    )]
+    #[OA\Get(summary: 'Get product detail')]
+    #[OA\Response(
+        response: 200,
+        description: 'Get product detail',
     )]
     public function productDetail(
         #[MapEntity(mapping: ['idProduct' => 'id'])]

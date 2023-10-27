@@ -6,6 +6,7 @@ use App\Entity\Customer;
 use App\Entity\Store;
 use App\Repository\CustomerRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use OpenApi\Attributes as OA;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,6 +15,7 @@ use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 #[Route('/api', name: 'api_')]
+#[OA\Tag('Customer')]
 class CustomerController extends RouteController
 {
     private CustomerRepository $customerRepository;
@@ -36,6 +38,11 @@ class CustomerController extends RouteController
         requirements: ['idStore' => '\d+'],
         methods: ['GET']
     )]
+    #[OA\Get(summary: 'Get customers list')]
+    #[OA\Response(
+        response: 200,
+        description: 'Get customers list'
+    )]
     public function customersList(
         #[MapEntity(mapping: ['idStore' => 'id'])]
         Store $store
@@ -50,6 +57,11 @@ class CustomerController extends RouteController
         name: 'app_customers_list_page',
         requirements: ['idStore' => '\d+', 'page' => '\d+'],
         methods: ['GET']
+    )]
+    #[OA\Get(summary: 'Get customers list with page selector')]
+    #[OA\Response(
+        response: 200,
+        description: 'Get customers list with page selector',
     )]
     public function customerListPage(
         #[MapEntity(mapping: ['idStore' => 'id'])]
@@ -66,6 +78,11 @@ class CustomerController extends RouteController
         name: 'app_customers_detail',
         requirements: ['idStore' => '\d+', 'idCustomer' => '\d+'],
         methods: ['GET']
+    )]
+    #[OA\Get(summary: 'Get customer details')]
+    #[OA\Response(
+        response: 200,
+        description: 'Get customer details',
     )]
     public function customerDetail(
         #[MapEntity(mapping: ['idStore' => 'store', 'idCustomer' => 'id'])]
@@ -89,6 +106,11 @@ class CustomerController extends RouteController
         name: 'app_customers_add',
         requirements: ['idStore' => '\d+'],
         methods: ['POST']
+    )]
+    #[OA\Post(summary: 'Add new customer to the store')]
+    #[OA\Response(
+        response: 200,
+        description: 'Add new customer to the store',
     )]
     public function createCustomer(
         #[MapEntity(mapping: ['idStore' => 'id'])]
@@ -140,6 +162,11 @@ class CustomerController extends RouteController
         name: "app_customers_delete",
         requirements: ['idStore' => '\d+', 'idCustomer' => '\d+'],
         methods: ['DELETE']
+    )]
+    #[OA\Delete(summary: 'Remove a customer from the store')]
+    #[OA\Response(
+        response: 200,
+        description: 'Remove a customer from the store',
     )]
     public function deleteCustomer(
         #[MapEntity(mapping: ['idCustomer' => 'id', 'idStore' => 'store'])]
