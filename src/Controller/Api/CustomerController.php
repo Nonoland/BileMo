@@ -16,13 +16,13 @@ use Symfony\Component\Routing\Annotation\Route;
 class CustomerController extends RouteController
 {
     private CustomerRepository $customerRepository;
-    private StoreRepository $storeRepository;
     private EntityManagerInterface $entityManager;
 
-    public function __construct(CustomerRepository $customerRepository, StoreRepository $storeRepository, EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        CustomerRepository $customerRepository,
+        EntityManagerInterface $entityManager
+    ) {
         $this->customerRepository = $customerRepository;
-        $this->storeRepository = $storeRepository;
         $this->entityManager = $entityManager;
     }
 
