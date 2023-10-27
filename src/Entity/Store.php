@@ -28,7 +28,7 @@ class Store
 
     public function __construct(
         private TagAwareCacheInterface $cache
-    ){
+    ) {
         $this->customers = new ArrayCollection();
         $this->users = new ArrayCollection();
     }
