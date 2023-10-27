@@ -3,8 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\Store;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @extends ServiceEntityRepository<Store>
@@ -21,28 +23,14 @@ class StoreRepository extends ServiceEntityRepository
         parent::__construct($registry, Store::class);
     }
 
-//    /**
-//     * @return Store[] Returns an array of Store objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('s')
-//            ->andWhere('s.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('s.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Store
-//    {
-//        return $this->createQueryBuilder('s')
-//            ->andWhere('s.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function findByPage(UserInterface $user, int $page, int $maxPerPage = 10)
+    {
+        return $this->createQueryBuilder('s')
+            ->where(':user MEMBER OF s.users')
+            ->setParameter('user', $user)
+            ->setMaxResults($maxPerPage)
+            ->setFirstResult($maxPerPage * ($page - 1))
+            ->getQuery()
+            ->getResult();
+    }
 }
