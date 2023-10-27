@@ -45,13 +45,13 @@ class ProductController extends RouteController
     }
 
     #[Route(
-        '/products/detail/{id}',
+        '/products/detail/{idProduct}',
         name: 'app_products_detail',
-        requirements: ['id' => '\d+'],
+        requirements: ['idProduct' => '\d+'],
         methods: ['GET']
     )]
     public function productDetail(
-        #[MapEntity(mapping: ['id' => 'id'])]
+        #[MapEntity(mapping: ['idProduct' => 'id'])]
         Product $product
     ): JsonResponse {
         return $this->json($this->getObjectDetail(
@@ -59,7 +59,7 @@ class ProductController extends RouteController
                 $item->tag('productsDetails');
                 return $product->getData();
             }),
-            $this->generateUrl('api_app_products_detail', ['id' => $product->getId()])
+            $this->generateUrl('api_app_products_detail', ['idProduct' => $product->getId()])
         ));
     }
 
@@ -75,7 +75,7 @@ class ProductController extends RouteController
                 $data['data'][] = [
                     'name' => $product->getName(),
                     'gtin' => $product->getGtin(),
-                    'link' => $this->generateUrl('api_app_products_detail', ['id' => $product->getId()])
+                    'link' => $this->generateUrl('api_app_products_detail', ['idProduct' => $product->getId()])
                 ];
             }
 
