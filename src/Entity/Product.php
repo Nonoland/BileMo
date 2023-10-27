@@ -8,7 +8,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
-#[ORM\HasLifecycleCallbacks]
 class Product
 {
     #[ORM\Id]
@@ -175,11 +174,5 @@ class Product
             'description' => $this->getDescription(),
             'features' => $this->getFeatures()
         ];
-    }
-
-    #[ORM\PostPersist]
-    public function clearCache()
-    {
-        $this->cache->invalidateTags(["productsLists", "productsDetails"]);
     }
 }

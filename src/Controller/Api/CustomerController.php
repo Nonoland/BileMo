@@ -7,6 +7,7 @@ use App\Entity\Store;
 use App\Repository\CustomerRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use OpenApi\Attributes as OA;
+use phpDocumentor\Reflection\DocBlock\Tags\Property;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -41,7 +42,57 @@ class CustomerController extends RouteController
     #[OA\Get(summary: 'Get customers list')]
     #[OA\Response(
         response: 200,
-        description: 'Get customers list'
+        description: 'Get customers list',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'data',
+                    type: 'array',
+                    items: new OA\Items(
+                        properties: [
+                            new OA\Property(
+                                property: 'id',
+                                type: 'integer'
+                            ),
+                            new OA\Property(
+                                property: 'lastname',
+                                type: 'string'
+                            ),
+                            new OA\Property(
+                                property: 'firstname',
+                                type: 'string'
+                            ),
+                            new OA\Property(
+                                property: 'email',
+                                type: 'string'
+                            ),
+                            new OA\Property(
+                                property: 'link',
+                                type: 'string'
+                            ),
+                        ],
+                        maxItems: 10
+                    )
+                ),
+                new OA\Property(
+                    property: 'links',
+                    properties: [
+                        new OA\Property(
+                            property: 'self',
+                            type: 'string'
+                        ),
+                        new OA\Property(
+                            property: 'next',
+                            type: 'string'
+                        ),
+                        new OA\Property(
+                            property: 'prev',
+                            type: 'string'
+                        ),
+                    ]
+                )
+            ]
+        )
     )]
     public function customersList(
         #[MapEntity(mapping: ['idStore' => 'id'])]
@@ -62,6 +113,56 @@ class CustomerController extends RouteController
     #[OA\Response(
         response: 200,
         description: 'Get customers list with page selector',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'data',
+                    type: 'array',
+                    items: new OA\Items(
+                        properties: [
+                            new OA\Property(
+                                property: 'id',
+                                type: 'integer'
+                            ),
+                            new OA\Property(
+                                property: 'lastname',
+                                type: 'string'
+                            ),
+                            new OA\Property(
+                                property: 'firstname',
+                                type: 'string'
+                            ),
+                            new OA\Property(
+                                property: 'email',
+                                type: 'string'
+                            ),
+                            new OA\Property(
+                                property: 'link',
+                                type: 'string'
+                            ),
+                        ],
+                        maxItems: 10
+                    )
+                ),
+                new OA\Property(
+                    property: 'links',
+                    properties: [
+                        new OA\Property(
+                            property: 'self',
+                            type: 'string'
+                        ),
+                        new OA\Property(
+                            property: 'next',
+                            type: 'string'
+                        ),
+                        new OA\Property(
+                            property: 'prev',
+                            type: 'string'
+                        ),
+                    ]
+                )
+            ]
+        )
     )]
     public function customerListPage(
         #[MapEntity(mapping: ['idStore' => 'id'])]
@@ -83,6 +184,49 @@ class CustomerController extends RouteController
     #[OA\Response(
         response: 200,
         description: 'Get customer details',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'data',
+                    properties: [
+                        new OA\Property(
+                            property: 'id',
+                            type: 'integer'
+                        ),
+                        new OA\Property(
+                            property: 'lastname',
+                            type: 'string'
+                        ),
+                        new OA\Property(
+                            property: 'firstname',
+                            type: 'string'
+                        ),
+                        new OA\Property(
+                            property: 'email',
+                            type: 'string'
+                        ),
+                        new OA\Property(
+                            property: 'store_id',
+                            type: 'integer'
+                        ),
+                        new OA\Property(
+                            property: 'store_name',
+                            type: 'string'
+                        ),
+                    ],
+                    type: 'object'
+                ),
+                new OA\Property(
+                    property: 'links',
+                    properties: [
+                        new OA\Property(
+                            property: 'self',
+                            type: 'string'
+                        )
+                    ]
+                )
+            ]
+        )
     )]
     public function customerDetail(
         #[MapEntity(mapping: ['idStore' => 'store', 'idCustomer' => 'id'])]
@@ -111,6 +255,43 @@ class CustomerController extends RouteController
     #[OA\Response(
         response: 200,
         description: 'Add new customer to the store',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'data',
+                    type: 'array',
+                    items: new OA\Items(
+                        properties: [
+                            new OA\Property(
+                                property: 'id',
+                                type: 'integer'
+                            ),
+                            new OA\Property(
+                                property: 'lastname',
+                                type: 'string'
+                            ),
+                            new OA\Property(
+                                property: 'firstname',
+                                type: 'string'
+                            ),
+                            new OA\Property(
+                                property: 'email',
+                                type: 'string'
+                            ),
+                            new OA\Property(
+                                property: 'link',
+                                type: 'string'
+                            ),
+                        ],
+                        maxItems: 10
+                    )
+                ),
+                new OA\Property(
+                    property: 'links',
+                    type: 'string'
+                )
+            ]
+        )
     )]
     public function createCustomer(
         #[MapEntity(mapping: ['idStore' => 'id'])]
@@ -153,7 +334,8 @@ class CustomerController extends RouteController
         return $this->json([
             'status' => '201',
             'message' => 'Customer successfully created',
-            'data' => $customer->getData()
+            'data' => $customer->getData(),
+            'link' => $this->generateUrl('api_app_customers_detail', ['idStore' => $store->getId(), 'idCustomer' => $customer->getId()])
         ], 201);
     }
 
