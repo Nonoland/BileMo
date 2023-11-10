@@ -33,6 +33,48 @@ class StoreController extends RouteController
     #[OA\Response(
         response: 200,
         description: 'Get stores list',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'data',
+                    type: 'array',
+                    items: new OA\Items(
+                        properties: [
+                            new OA\Property(
+                                property: 'name',
+                                type: 'string'
+                            ),
+                            new OA\Property(
+                                property: 'link',
+                                type: 'string',
+                                format: 'uri'
+                            ),
+                        ],
+                        maxItems: 10
+                    )
+                ),
+                new OA\Property(
+                    property: 'links',
+                    properties: [
+                        new OA\Property(
+                            property: 'self',
+                            type: 'string',
+                            format: 'uri'
+                        ),
+                        new OA\Property(
+                            property: 'next',
+                            type: 'string',
+                            format: 'uri'
+                        ),
+                        new OA\Property(
+                            property: 'prev',
+                            type: 'string',
+                            format: 'uri'
+                        ),
+                    ]
+                )
+            ]
+        )
     )]
     public function storeList(): JsonResponse
     {
@@ -49,6 +91,48 @@ class StoreController extends RouteController
     #[OA\Response(
         response: 200,
         description: 'Get stores list with page selector',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'data',
+                    type: 'array',
+                    items: new OA\Items(
+                        properties: [
+                            new OA\Property(
+                                property: 'name',
+                                type: 'string'
+                            ),
+                            new OA\Property(
+                                property: 'link',
+                                type: 'string',
+                                format: 'uri'
+                            ),
+                        ],
+                        maxItems: 10
+                    )
+                ),
+                new OA\Property(
+                    property: 'links',
+                    properties: [
+                        new OA\Property(
+                            property: 'self',
+                            type: 'string',
+                            format: 'uri'
+                        ),
+                        new OA\Property(
+                            property: 'next',
+                            type: 'string',
+                            format: 'uri'
+                        ),
+                        new OA\Property(
+                            property: 'prev',
+                            type: 'string',
+                            format: 'uri'
+                        ),
+                    ]
+                )
+            ]
+        )
     )]
     public function storeListPage(int $page): JsonResponse
     {
@@ -65,6 +149,33 @@ class StoreController extends RouteController
     #[OA\Response(
         response: 200,
         description: 'Get store details',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'data',
+                    type: 'array',
+                    items: new OA\Items(
+                        properties: [
+                            new OA\Property(
+                                property: 'name',
+                                type: 'string'
+                            )
+                        ],
+                        maxItems: 10
+                    )
+                ),
+                new OA\Property(
+                    property: 'links',
+                    properties: [
+                        new OA\Property(
+                            property: 'self',
+                            type: 'string',
+                            format: 'uri'
+                        )
+                    ]
+                )
+            ]
+        )
     )]
     public function storeDetail(
         #[MapEntity(mapping: ['idStore' => 'id'])]
