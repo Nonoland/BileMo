@@ -13,7 +13,8 @@ class EntityListener
 
     public function __construct(
         private TagAwareCacheInterface $cache
-    ) {
+    )
+    {
 
     }
 
