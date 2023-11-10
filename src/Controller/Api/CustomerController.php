@@ -7,7 +7,6 @@ use App\Entity\Store;
 use App\Repository\CustomerRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use OpenApi\Attributes as OA;
-use phpDocumentor\Reflection\DocBlock\Tags\Property;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -64,11 +63,13 @@ class CustomerController extends RouteController
                             ),
                             new OA\Property(
                                 property: 'email',
-                                type: 'string'
+                                type: 'string',
+                                format: 'email'
                             ),
                             new OA\Property(
                                 property: 'link',
-                                type: 'string'
+                                type: 'string',
+                                format: 'uri'
                             ),
                         ],
                         maxItems: 10
@@ -79,15 +80,18 @@ class CustomerController extends RouteController
                     properties: [
                         new OA\Property(
                             property: 'self',
-                            type: 'string'
+                            type: 'string',
+                            format: 'uri'
                         ),
                         new OA\Property(
                             property: 'next',
-                            type: 'string'
+                            type: 'string',
+                            format: 'uri'
                         ),
                         new OA\Property(
                             property: 'prev',
-                            type: 'string'
+                            type: 'string',
+                            format: 'uri'
                         ),
                     ]
                 )
@@ -134,11 +138,13 @@ class CustomerController extends RouteController
                             ),
                             new OA\Property(
                                 property: 'email',
-                                type: 'string'
+                                type: 'string',
+                                format: 'email'
                             ),
                             new OA\Property(
                                 property: 'link',
-                                type: 'string'
+                                type: 'string',
+                                format: 'uri'
                             ),
                         ],
                         maxItems: 10
@@ -149,15 +155,18 @@ class CustomerController extends RouteController
                     properties: [
                         new OA\Property(
                             property: 'self',
-                            type: 'string'
+                            type: 'string',
+                            format: 'uri'
                         ),
                         new OA\Property(
                             property: 'next',
-                            type: 'string'
+                            type: 'string',
+                            format: 'uri'
                         ),
                         new OA\Property(
                             property: 'prev',
-                            type: 'string'
+                            type: 'string',
+                            format: 'uri'
                         ),
                     ]
                 )
@@ -203,7 +212,8 @@ class CustomerController extends RouteController
                         ),
                         new OA\Property(
                             property: 'email',
-                            type: 'string'
+                            type: 'string',
+                            format: 'email'
                         ),
                         new OA\Property(
                             property: 'store_id',
@@ -221,7 +231,8 @@ class CustomerController extends RouteController
                     properties: [
                         new OA\Property(
                             property: 'self',
-                            type: 'string'
+                            type: 'string',
+                            format: 'uri'
                         )
                     ]
                 )
@@ -276,11 +287,13 @@ class CustomerController extends RouteController
                             ),
                             new OA\Property(
                                 property: 'email',
-                                type: 'string'
+                                type: 'string',
+                                format: 'email'
                             ),
                             new OA\Property(
                                 property: 'link',
-                                type: 'string'
+                                type: 'string',
+                                format: 'uri'
                             ),
                         ],
                         maxItems: 10
@@ -288,7 +301,8 @@ class CustomerController extends RouteController
                 ),
                 new OA\Property(
                     property: 'links',
-                    type: 'string'
+                    type: 'string',
+                    format: 'uri'
                 )
             ]
         )
@@ -349,6 +363,19 @@ class CustomerController extends RouteController
     #[OA\Response(
         response: 200,
         description: 'Remove a customer from the store',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'status',
+                    type: 'integer',
+                    enum: [200, 404, 500]
+                ),
+                new OA\Property(
+                    property: 'message',
+                    type: 'string'
+                )
+            ]
+        )
     )]
     public function deleteCustomer(
         #[MapEntity(mapping: ['idCustomer' => 'id', 'idStore' => 'store'])]

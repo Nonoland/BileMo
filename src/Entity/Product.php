@@ -42,11 +42,6 @@ class Product
     #[ORM\Column(length: 14)]
     private ?string $gtin = null;
 
-    public function __construct(
-        private TagAwareCacheInterface $cache,
-    ) {
-    }
-
     public function getId(): ?int
     {
         return $this->id;
