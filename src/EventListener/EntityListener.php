@@ -4,6 +4,7 @@ namespace App\EventListener;
 
 use App\Entity\Customer;
 use App\Entity\Product;
+use App\Entity\Store;
 use Doctrine\ORM\Mapping\PostPersist;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
@@ -27,6 +28,10 @@ class EntityListener
 
         if ($args->getObject() instanceof Product) {
             $this->cache->invalidateTags(["productsLists", "productsDetails"]);
+        }
+
+        if ($args->getObject() instanceof Store) {
+            $this->cache->invalidateTags(["storeLists", "storesDetails"]);
         }
     }
 }
