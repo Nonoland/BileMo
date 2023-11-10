@@ -1,6 +1,6 @@
-# Snowtricks
+# BeliMo
 
-Snowtricks est une application web développée en Symfony 6.3 et PHP 8.1. 
+BeliMo est une application web exposant une API, développée en Symfony 6.3 et PHP 8.1. 
 
 
 ## Prérequis

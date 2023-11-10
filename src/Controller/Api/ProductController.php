@@ -4,7 +4,7 @@ namespace App\Controller\Api;
 
 use App\Entity\Product;
 use App\Repository\ProductRepository;
-use Psr\Cache\InvalidArgumentException;
+use OpenApi\Attributes as OA;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -12,6 +12,7 @@ use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 #[Route('/api', name: 'api_')]
+#[OA\Tag('Product')]
 class ProductController extends RouteController
 {
     private ProductRepository $productRepository;
@@ -28,6 +29,63 @@ class ProductController extends RouteController
         name: 'app_products_list',
         methods: ['GET']
     )]
+    #[OA\Get(summary: 'Get products list')]
+    #[OA\Response(
+        response: 200,
+        description: 'Get products list',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'data',
+                    type: 'array',
+                    items: new OA\Items(
+                        properties: [
+                            new OA\Property(
+                                property: 'id',
+                                type: 'integer'
+                            ),
+                            new OA\Property(
+                                property: 'name',
+                                type: 'string'
+                            ),
+                            new OA\Property(
+                                property: 'gtin',
+                                description: 'GTIN Code',
+                                type: 'string',
+                                pattern: '^\d{8}(\d{5})?$'
+                            ),
+                            new OA\Property(
+                                property: 'link',
+                                type: 'string',
+                                format: 'uri'
+                            ),
+                        ],
+                        maxItems: 10
+                    )
+                ),
+                new OA\Property(
+                    property: 'links',
+                    properties: [
+                        new OA\Property(
+                            property: 'self',
+                            type: 'string',
+                            format: 'uri'
+                        ),
+                        new OA\Property(
+                            property: 'next',
+                            type: 'string',
+                            format: 'uri'
+                        ),
+                        new OA\Property(
+                            property: 'prev',
+                            type: 'string',
+                            format: 'uri'
+                        ),
+                    ]
+                )
+            ]
+        )
+    )]
     public function productList(): JsonResponse
     {
         return $this->json($this->getProductPageSchema());
@@ -39,19 +97,150 @@ class ProductController extends RouteController
         requirements: ['page' => '\d+'],
         methods: ['GET']
     )]
+    #[OA\Get(summary: 'Get products list with page selector')]
+    #[OA\Response(
+        response: 200,
+        description: 'Get products list with page selector',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'data',
+                    type: 'array',
+                    items: new OA\Items(
+                        properties: [
+                            new OA\Property(
+                                property: 'id',
+                                type: 'integer'
+                            ),
+                            new OA\Property(
+                                property: 'name',
+                                type: 'string'
+                            ),
+                            new OA\Property(
+                                property: 'gtin',
+                                description: 'GTIN Code',
+                                type: 'string',
+                                pattern: '^\d{8}(\d{5})?$'
+                            ),
+                            new OA\Property(
+                                property: 'link',
+                                type: 'string',
+                                format: 'uri'
+                            ),
+                        ],
+                        maxItems: 10
+                    )
+                ),
+                new OA\Property(
+                    property: 'links',
+                    properties: [
+                        new OA\Property(
+                            property: 'self',
+                            type: 'string',
+                            format: 'uri'
+                        ),
+                        new OA\Property(
+                            property: 'next',
+                            type: 'string',
+                            format: 'uri'
+                        ),
+                        new OA\Property(
+                            property: 'prev',
+                            type: 'string',
+                            format: 'uri'
+                        ),
+                    ]
+                )
+            ]
+        )
+    )]
     public function productListPage(int $page): JsonResponse
     {
         return $this->json($this->getProductPageSchema($page));
     }
 
     #[Route(
-        '/products/detail/{id}',
+        '/products/detail/{idProduct}',
         name: 'app_products_detail',
-        requirements: ['id' => '\d+'],
+        requirements: ['idProduct' => '\d+'],
         methods: ['GET']
     )]
+    #[OA\Get(summary: 'Get product detail')]
+    #[OA\Response(
+        response: 200,
+        description: 'Get product detail',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'data',
+                    type: 'array',
+                    items: new OA\Items(
+                        properties: [
+                            new OA\Property(
+                                property: 'id',
+                                type: 'integer'
+                            ),
+                            new OA\Property(
+                                property: 'name',
+                                type: 'string'
+                            ),
+                            new OA\Property(
+                                property: 'gtin',
+                                description: 'GTIN Code',
+                                type: 'string',
+                                pattern: '^\d{8}(\d{5})?$'
+                            ),
+                            new OA\Property(
+                                property: 'brand',
+                                type: 'string'
+                            )
+                            ,
+                            new OA\Property(
+                                property: 'image',
+                                type: 'string',
+                                format: 'uri'
+                            ),
+                            new OA\Property(
+                                property: 'supplier_price',
+                                type: 'float'
+                            ),
+                            new OA\Property(
+                                property: 'suggested_price',
+                                type: 'float'
+                            ),
+                            new OA\Property(
+                                property: 'short_description',
+                                type: 'string'
+                            ),
+                            new OA\Property(
+                                property: 'description',
+                                type: 'string'
+                            ),
+                            new OA\Property(
+                                property: 'features',
+                                type: 'array',
+                                items: new OA\Items(
+                                    type: 'string'
+                                )
+                            )
+                        ]
+                    )
+                ),
+                new OA\Property(
+                    property: 'links',
+                    properties: [
+                        new OA\Property(
+                            property: 'self',
+                            type: 'string',
+                            format: 'uri'
+                        )
+                    ]
+                )
+            ]
+        )
+    )]
     public function productDetail(
-        #[MapEntity(mapping: ['id' => 'id'])]
+        #[MapEntity(mapping: ['idProduct' => 'id'])]
         Product $product
     ): JsonResponse {
         return $this->json($this->getObjectDetail(
@@ -59,7 +248,7 @@ class ProductController extends RouteController
                 $item->tag('productsDetails');
                 return $product->getData();
             }),
-            $this->generateUrl('api_app_products_detail', ['id' => $product->getId()])
+            $this->generateUrl('api_app_products_detail', ['idProduct' => $product->getId()])
         ));
     }
 
@@ -73,9 +262,10 @@ class ProductController extends RouteController
             $data['data'] = [];
             foreach ($products as $product) {
                 $data['data'][] = [
+                    'id' => $product->getId(),
                     'name' => $product->getName(),
                     'gtin' => $product->getGtin(),
-                    'link' => $this->generateUrl('api_app_products_detail', ['id' => $product->getId()])
+                    'link' => $this->generateUrl('api_app_products_detail', ['idProduct' => $product->getId()])
                 ];
             }
 

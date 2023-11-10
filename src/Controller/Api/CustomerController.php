@@ -6,6 +6,7 @@ use App\Entity\Customer;
 use App\Entity\Store;
 use App\Repository\CustomerRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use OpenApi\Attributes as OA;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,6 +15,7 @@ use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 #[Route('/api', name: 'api_')]
+#[OA\Tag('Customer')]
 class CustomerController extends RouteController
 {
     private CustomerRepository $customerRepository;
@@ -36,6 +38,66 @@ class CustomerController extends RouteController
         requirements: ['idStore' => '\d+'],
         methods: ['GET']
     )]
+    #[OA\Get(summary: 'Get customers list')]
+    #[OA\Response(
+        response: 200,
+        description: 'Get customers list',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'data',
+                    type: 'array',
+                    items: new OA\Items(
+                        properties: [
+                            new OA\Property(
+                                property: 'id',
+                                type: 'integer'
+                            ),
+                            new OA\Property(
+                                property: 'lastname',
+                                type: 'string'
+                            ),
+                            new OA\Property(
+                                property: 'firstname',
+                                type: 'string'
+                            ),
+                            new OA\Property(
+                                property: 'email',
+                                type: 'string',
+                                format: 'email'
+                            ),
+                            new OA\Property(
+                                property: 'link',
+                                type: 'string',
+                                format: 'uri'
+                            ),
+                        ],
+                        maxItems: 10
+                    )
+                ),
+                new OA\Property(
+                    property: 'links',
+                    properties: [
+                        new OA\Property(
+                            property: 'self',
+                            type: 'string',
+                            format: 'uri'
+                        ),
+                        new OA\Property(
+                            property: 'next',
+                            type: 'string',
+                            format: 'uri'
+                        ),
+                        new OA\Property(
+                            property: 'prev',
+                            type: 'string',
+                            format: 'uri'
+                        ),
+                    ]
+                )
+            ]
+        )
+    )]
     public function customersList(
         #[MapEntity(mapping: ['idStore' => 'id'])]
         Store $store
@@ -50,6 +112,66 @@ class CustomerController extends RouteController
         name: 'app_customers_list_page',
         requirements: ['idStore' => '\d+', 'page' => '\d+'],
         methods: ['GET']
+    )]
+    #[OA\Get(summary: 'Get customers list with page selector')]
+    #[OA\Response(
+        response: 200,
+        description: 'Get customers list with page selector',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'data',
+                    type: 'array',
+                    items: new OA\Items(
+                        properties: [
+                            new OA\Property(
+                                property: 'id',
+                                type: 'integer'
+                            ),
+                            new OA\Property(
+                                property: 'lastname',
+                                type: 'string'
+                            ),
+                            new OA\Property(
+                                property: 'firstname',
+                                type: 'string'
+                            ),
+                            new OA\Property(
+                                property: 'email',
+                                type: 'string',
+                                format: 'email'
+                            ),
+                            new OA\Property(
+                                property: 'link',
+                                type: 'string',
+                                format: 'uri'
+                            ),
+                        ],
+                        maxItems: 10
+                    )
+                ),
+                new OA\Property(
+                    property: 'links',
+                    properties: [
+                        new OA\Property(
+                            property: 'self',
+                            type: 'string',
+                            format: 'uri'
+                        ),
+                        new OA\Property(
+                            property: 'next',
+                            type: 'string',
+                            format: 'uri'
+                        ),
+                        new OA\Property(
+                            property: 'prev',
+                            type: 'string',
+                            format: 'uri'
+                        ),
+                    ]
+                )
+            ]
+        )
     )]
     public function customerListPage(
         #[MapEntity(mapping: ['idStore' => 'id'])]
@@ -66,6 +188,56 @@ class CustomerController extends RouteController
         name: 'app_customers_detail',
         requirements: ['idStore' => '\d+', 'idCustomer' => '\d+'],
         methods: ['GET']
+    )]
+    #[OA\Get(summary: 'Get customer details')]
+    #[OA\Response(
+        response: 200,
+        description: 'Get customer details',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'data',
+                    properties: [
+                        new OA\Property(
+                            property: 'id',
+                            type: 'integer'
+                        ),
+                        new OA\Property(
+                            property: 'lastname',
+                            type: 'string'
+                        ),
+                        new OA\Property(
+                            property: 'firstname',
+                            type: 'string'
+                        ),
+                        new OA\Property(
+                            property: 'email',
+                            type: 'string',
+                            format: 'email'
+                        ),
+                        new OA\Property(
+                            property: 'store_id',
+                            type: 'integer'
+                        ),
+                        new OA\Property(
+                            property: 'store_name',
+                            type: 'string'
+                        ),
+                    ],
+                    type: 'object'
+                ),
+                new OA\Property(
+                    property: 'links',
+                    properties: [
+                        new OA\Property(
+                            property: 'self',
+                            type: 'string',
+                            format: 'uri'
+                        )
+                    ]
+                )
+            ]
+        )
     )]
     public function customerDetail(
         #[MapEntity(mapping: ['idStore' => 'store', 'idCustomer' => 'id'])]
@@ -89,6 +261,51 @@ class CustomerController extends RouteController
         name: 'app_customers_add',
         requirements: ['idStore' => '\d+'],
         methods: ['POST']
+    )]
+    #[OA\Post(summary: 'Add new customer to the store')]
+    #[OA\Response(
+        response: 200,
+        description: 'Add new customer to the store',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'data',
+                    type: 'array',
+                    items: new OA\Items(
+                        properties: [
+                            new OA\Property(
+                                property: 'id',
+                                type: 'integer'
+                            ),
+                            new OA\Property(
+                                property: 'lastname',
+                                type: 'string'
+                            ),
+                            new OA\Property(
+                                property: 'firstname',
+                                type: 'string'
+                            ),
+                            new OA\Property(
+                                property: 'email',
+                                type: 'string',
+                                format: 'email'
+                            ),
+                            new OA\Property(
+                                property: 'link',
+                                type: 'string',
+                                format: 'uri'
+                            ),
+                        ],
+                        maxItems: 10
+                    )
+                ),
+                new OA\Property(
+                    property: 'links',
+                    type: 'string',
+                    format: 'uri'
+                )
+            ]
+        )
     )]
     public function createCustomer(
         #[MapEntity(mapping: ['idStore' => 'id'])]
@@ -131,7 +348,8 @@ class CustomerController extends RouteController
         return $this->json([
             'status' => '201',
             'message' => 'Customer successfully created',
-            'data' => $customer->getData()
+            'data' => $customer->getData(),
+            'link' => $this->generateUrl('api_app_customers_detail', ['idStore' => $store->getId(), 'idCustomer' => $customer->getId()])
         ], 201);
     }
 
@@ -140,6 +358,24 @@ class CustomerController extends RouteController
         name: "app_customers_delete",
         requirements: ['idStore' => '\d+', 'idCustomer' => '\d+'],
         methods: ['DELETE']
+    )]
+    #[OA\Delete(summary: 'Remove a customer from the store')]
+    #[OA\Response(
+        response: 200,
+        description: 'Remove a customer from the store',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'status',
+                    type: 'integer',
+                    enum: [200, 404, 500]
+                ),
+                new OA\Property(
+                    property: 'message',
+                    type: 'string'
+                )
+            ]
+        )
     )]
     public function deleteCustomer(
         #[MapEntity(mapping: ['idCustomer' => 'id', 'idStore' => 'store'])]
