@@ -326,7 +326,7 @@ class CustomerController extends RouteController
         }
 
         $email = $request->request->get('email');
-        $emailFind = $this->customerRepository->findBy(['email' => $email]);
+        $emailFind = $this->customerRepository->findBy(['email' => $email, 'store' => $store]);
 
         if (!empty($emailFind)) {
             return $this->json([
