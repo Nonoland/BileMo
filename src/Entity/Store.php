@@ -26,9 +26,7 @@ class Store
     #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'stores')]
     private Collection $users;
 
-    public function __construct(
-        private TagAwareCacheInterface $cache
-    )
+    public function __construct()
     {
         $this->customers = new ArrayCollection();
         $this->users = new ArrayCollection();
@@ -118,11 +116,5 @@ class Store
         return [
             'name' => $this->getName()
         ];
-    }
-
-    #[ORM\PostPersist]
-    public function clearCache()
-    {
-        $this->cache->invalidateTags(["storeLists", "storesDetails"]);
     }
 }
