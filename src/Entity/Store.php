@@ -26,7 +26,9 @@ class Store
     #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'stores')]
     private Collection $users;
 
-    public function __construct()
+    public function __construct(
+        private TagAwareCacheInterface $cache
+    )
     {
         $this->customers = new ArrayCollection();
         $this->users = new ArrayCollection();
