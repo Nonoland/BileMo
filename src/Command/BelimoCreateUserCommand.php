@@ -53,7 +53,7 @@ class BelimoCreateUserCommand extends Command
 
         $user->setPassword($this->passwordHasher->hashPassword($user, $password));
 
-        $admin = $io->ask('User admin ? (yes/no) [no]', 'no');
+        $admin = $io->ask('User admin ? (yes/no)', 'no');
         if ($admin !== "no") {
             $user->setRoles(['ROLE_ADMIN']);
         }
