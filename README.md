@@ -56,10 +56,13 @@ php bin/console doctrine:migrations:migrate
 php bin/console doctrine:fixtures:load
 ```
 
-9. Lancez le serveur Symfony :
+9. Ajouter un utilisateur
 
 ```bash
-symfony server:start
+php bin/console belimo:create-user
 ```
 
 10. Vous pouvez maintenant accéder à l'application à l'adresse http://localhost:8000
+
+Documentation API : /doc
+Panneau d'administration : /admin
