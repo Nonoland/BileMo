@@ -30,7 +30,7 @@ composer install
 cp .env.dist .env
 ```
 
-4. Ouvrez le fichier .env et modifiez la ligne `DATABASE_URL` avec vos informations de connexion à la base de données.
+4. Ouvrez le fichier .env et modifiez la ligne `DATABASE_URL` avec vos informations de connexion à la base de données et mettez en place une clé secret pour APP_SECRET et JWT_PASSPHRASE.
 
 5. Générer les clés privée et publique pour l'authentification par JWT
 
